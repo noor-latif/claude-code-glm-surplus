@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
-$Repo = 'yel-hadd/claude-code-zai'
+$Repo = 'noor-latif/claude-code-glm-surplus'
 $Ref = 'v1.3.0'
 $PlanUrl = 'https://www.surplusintelligence.ai/app/buy/quickstart'
 $Dest = Join-Path $HOME '.claudez'

@@ -1,6 +1,6 @@
 # Claude Code with Surplus Intelligence
 
-- [Setup guide](https://github.com/yel-hadd/claude-code-zai)
+- [Setup guide](https://github.com/noor-latif/claude-code-glm-surplus)
 - [Full local guide](llms-full.txt)
 - [OpenAI-compatible API](https://api.surplusintelligence.ai/v1)
 - [Claude-compatible API](https://api.surplusintelligence.ai/anthropic)

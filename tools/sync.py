@@ -22,7 +22,7 @@ SCRIPTS = [
     "scripts/claudez.ps1", "scripts/statusline.ps1",
     "config/settings.json", "install.sh", "install.ps1",
 ]
-SITE = "https://yel-hadd.github.io/claude-code-zai/"
+SITE = "https://noor-latif.github.io/claude-code-glm-surplus/"
 
 
 def read(rel):
@@ -116,7 +116,7 @@ def build():
     body = MARKER.sub(lambda m: m.group(3), readme)  # drop the marker comments, keep the code
     appendix = "\n".join(f"### {rel}\n\n{code_md(rel)}" for rel in SCRIPTS)
     out["docs/llms-full.txt"] = (
-        f"# Claude Code with Surplus Intelligence: full guide for LLMs\n\n> Source: https://github.com/yel-hadd/claude-code-zai"
+        f"# Claude Code with Surplus Intelligence: full guide for LLMs\n\n> Source: https://github.com/noor-latif/claude-code-glm-surplus"
         f" · Web: {SITE}\n\n{body.rstrip()}\n\n## Appendix: every script\n\n{appendix}"
     )
     return out

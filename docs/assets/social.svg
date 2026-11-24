@@ -6,7 +6,7 @@
     </linearGradient>
   </defs>
   <rect width="1280" height="640" fill="url(#bg)"/>
-  <text x="80" y="118" font-family="Noto Sans Mono, monospace" font-size="26" fill="#7d8590">github.com/yel-hadd/claude-code-zai</text>
+  <text x="80" y="118" font-family="Noto Sans Mono, monospace" font-size="26" fill="#7d8590">github.com/noor-latif/claude-code-glm-surplus</text>
   <text x="80" y="210" font-family="Noto Sans, sans-serif" font-weight="700" font-size="72" fill="#e6edf3">Claude Code on Surplus GLM-5.3</text>
   <text x="80" y="285" font-family="Noto Sans, sans-serif" font-size="36" fill="#9198a1">One-command switch for Linux, macOS and Windows</text>
   <g font-family="Noto Sans, sans-serif" font-size="28" fill="#e6edf3">

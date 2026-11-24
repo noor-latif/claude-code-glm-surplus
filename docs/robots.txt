@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yel-hadd.github.io/claude-code-zai/sitemap.xml
+Sitemap: https://noor-latif.github.io/claude-code-glm-surplus/sitemap.xml

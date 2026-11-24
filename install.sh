@@ -2,14 +2,14 @@
 # claudez installer for Linux and macOS.
 # Sets up `claudez` with Surplus model routing and DuckDuckGo web search.
 #
-#   curl -fsSL https://raw.githubusercontent.com/yel-hadd/claude-code-zai/v1.3.0/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/noor-latif/claude-code-glm-surplus/v1.3.0/install.sh | bash
 #   ./install.sh [--no-mcp] [--ref TAG] | --uninstall [--purge]
 #
 # Non-interactive: SURPLUS_API_KEY=... ./install.sh
-# https://github.com/yel-hadd/claude-code-zai
+# https://github.com/noor-latif/claude-code-glm-surplus
 set -euo pipefail
 
-REPO="yel-hadd/claude-code-zai"
+REPO="noor-latif/claude-code-glm-surplus"
 REF="v1.3.0"
 PLAN_URL="https://www.surplusintelligence.ai/app/buy/quickstart"
 DEST="$HOME/.claudez"

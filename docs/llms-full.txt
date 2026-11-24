@@ -1,6 +1,6 @@
 # Claude Code with Surplus Intelligence: full guide for LLMs
 
-> Source: https://github.com/yel-hadd/claude-code-zai · Web: https://yel-hadd.github.io/claude-code-zai/
+> Source: https://github.com/noor-latif/claude-code-glm-surplus · Web: https://noor-latif.github.io/claude-code-glm-surplus/
 
 # Claude Code with Surplus Intelligence
 
@@ -254,14 +254,14 @@ $parts -join ' | '
 # claudez installer for Linux and macOS.
 # Sets up `claudez` with Surplus model routing and DuckDuckGo web search.
 #
-#   curl -fsSL https://raw.githubusercontent.com/yel-hadd/claude-code-zai/v1.3.0/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/noor-latif/claude-code-glm-surplus/v1.3.0/install.sh | bash
 #   ./install.sh [--no-mcp] [--ref TAG] | --uninstall [--purge]
 #
 # Non-interactive: SURPLUS_API_KEY=... ./install.sh
-# https://github.com/yel-hadd/claude-code-zai
+# https://github.com/noor-latif/claude-code-glm-surplus
 set -euo pipefail
 
-REPO="yel-hadd/claude-code-zai"
+REPO="noor-latif/claude-code-glm-surplus"
 REF="v1.3.0"
 PLAN_URL="https://www.surplusintelligence.ai/app/buy/quickstart"
 DEST="$HOME/.claudez"
@@ -449,7 +449,7 @@ param(
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
-$Repo = 'yel-hadd/claude-code-zai'
+$Repo = 'noor-latif/claude-code-glm-surplus'
 $Ref = 'v1.3.0'
 $PlanUrl = 'https://www.surplusintelligence.ai/app/buy/quickstart'
 $Dest = Join-Path $HOME '.claudez'

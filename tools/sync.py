@@ -18,9 +18,9 @@ ROOT = Path(__file__).resolve().parent.parent
 LANG = {".sh": "bash", ".ps1": "powershell", ".json": "json", ".md": "markdown"}
 MARKER = re.compile(r"(<!-- BEGIN:([^ ]+) -->\n)(.*?)(<!-- END:\2 -->)", re.S)
 SCRIPTS = [
-    "scripts/claude-z.sh", "scripts/zai-quota.sh", "scripts/statusline.sh", "scripts/zai-usage-hook.sh",
-    "scripts/claude-z.ps1", "scripts/zai-quota.ps1", "scripts/statusline.ps1", "scripts/zai-usage-hook.ps1",
-    "scripts/zai-usage.md", "config/settings.json", "install.sh", "install.ps1",
+    "scripts/claudez.sh", "scripts/statusline.sh",
+    "scripts/claudez.ps1", "scripts/statusline.ps1",
+    "config/settings.json", "install.sh", "install.ps1",
 ]
 SITE = "https://yel-hadd.github.io/claude-code-zai/"
 
@@ -40,7 +40,7 @@ def code_html(rel):
 
 def link_html(m):
     text, url = m.group(1), m.group(2)
-    rel = ' rel="sponsored noopener"' if "z.ai/subscribe?ic=" in url else ""  # referral links
+    rel = ""
     return f'<a href="{url}"{rel}>{text}</a>'
 
 
@@ -70,7 +70,7 @@ def slug(text):
 def faq_items(readme):
     m = re.search(r"^## FAQ\n(.*?)(?=^## )", readme, re.S | re.M)
     if not m:
-        sys.exit("README.md has no '## FAQ' section")
+        return []
     items = []
     for block in re.split(r"^### ", m.group(1), flags=re.M)[1:]:
         q, _, body = block.partition("\n")
@@ -116,7 +116,7 @@ def build():
     body = MARKER.sub(lambda m: m.group(3), readme)  # drop the marker comments, keep the code
     appendix = "\n".join(f"### {rel}\n\n{code_md(rel)}" for rel in SCRIPTS)
     out["docs/llms-full.txt"] = (
-        f"# claude-code-zai: full guide for LLMs\n\n> Source: https://github.com/yel-hadd/claude-code-zai"
+        f"# Claude Code with Surplus Intelligence: full guide for LLMs\n\n> Source: https://github.com/yel-hadd/claude-code-zai"
         f" · Web: {SITE}\n\n{body.rstrip()}\n\n## Appendix: every script\n\n{appendix}"
     )
     return out

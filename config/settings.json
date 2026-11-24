@@ -1,19 +1,10 @@
 {
   "permissions": {
-    "deny": ["WebSearch", "Read(~/.config/zai/**)"]
+    "deny": ["Read(~/.config/surplus/**)"]
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude-z/statusline.sh",
+    "command": "~/.claudez/statusline.sh",
     "padding": 0
-  },
-  "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          { "type": "command", "command": "~/.claude-z/hooks/zai-usage-hook.sh", "timeout": 15 }
-        ]
-      }
-    ]
   }
 }

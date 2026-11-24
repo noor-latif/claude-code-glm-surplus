@@ -7,7 +7,7 @@
   </defs>
   <rect width="1280" height="640" fill="url(#bg)"/>
   <text x="80" y="118" font-family="Noto Sans Mono, monospace" font-size="26" fill="#7d8590">github.com/yel-hadd/claude-code-zai</text>
-  <text x="80" y="210" font-family="Noto Sans, sans-serif" font-weight="700" font-size="72" fill="#e6edf3">Claude Code on z.ai GLM-5.3</text>
+  <text x="80" y="210" font-family="Noto Sans, sans-serif" font-weight="700" font-size="72" fill="#e6edf3">Claude Code on Surplus GLM-5.3</text>
   <text x="80" y="285" font-family="Noto Sans, sans-serif" font-size="36" fill="#9198a1">One-command switch for Linux, macOS and Windows</text>
   <g font-family="Noto Sans, sans-serif" font-size="28" fill="#e6edf3">
     <rect x="80" y="330" width="232" height="52" rx="26" fill="#1f6feb" fill-opacity="0.18" stroke="#388bfd"/>
@@ -19,6 +19,6 @@
   </g>
   <rect x="80" y="430" width="1120" height="130" rx="14" fill="#010409" stroke="#30363d"/>
   <circle cx="112" cy="458" r="7" fill="#f85149"/><circle cx="136" cy="458" r="7" fill="#d29922"/><circle cx="160" cy="458" r="7" fill="#3fb950"/>
-  <text x="112" y="508" font-family="Noto Sans Mono, monospace" font-size="27" fill="#e6edf3"><tspan fill="#3fb950">$</tspan> curl -fsSL …/install.sh | bash   <tspan fill="#7d8590">&amp;&amp;</tspan>   claude-z</text>
-  <text x="112" y="544" font-family="Noto Sans Mono, monospace" font-size="24" fill="#7d8590">glm-5.3[1m] · ctx 12% · 5h 8% · wk 41%</text>
+  <text x="112" y="508" font-family="Noto Sans Mono, monospace" font-size="27" fill="#e6edf3"><tspan fill="#3fb950">$</tspan> ./install.sh   <tspan fill="#7d8590">&amp;&amp;</tspan>   claudez</text>
+  <text x="112" y="544" font-family="Noto Sans Mono, monospace" font-size="24" fill="#7d8590">glm-5.3[1m] · qwen3.8-omni-flash</text>
 </svg>

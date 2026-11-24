@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-# claude-z status line: model · context used · z.ai quota
-# https://github.com/yel-hadd/claude-code-zai
+# claudez status line: model · context used
 input="$(cat)"
-model="$(jq -r '.model.display_name // .model.id // "GLM"' <<<"$input")"
+model="$(jq -r '.model.display_name // .model.id // "GLM-5.3"' <<<"$input")"
 ctx="$(jq -r '.context_window.used_percentage // empty | floor' <<<"$input" 2>/dev/null)"
-quota="$("$(dirname "$0")/zai-quota.sh" --short)"
 printf '%s' "$model"
 [ -n "$ctx" ] && printf ' · ctx %s%%' "$ctx"
-printf ' · %s\n' "$quota"

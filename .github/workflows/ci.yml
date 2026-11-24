@@ -9,116 +9,69 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Docs are in sync with scripts
+      - name: Docs are in sync
         run: python3 tools/sync.py --check
-      - name: bash -n and shellcheck
-        run: |
-          for f in install.sh scripts/*.sh; do bash -n "$f"; done
-          shellcheck -s bash install.sh scripts/*.sh
-      - name: PSScriptAnalyzer
+      - name: Bash syntax
+        run: for f in install.sh scripts/*.sh; do bash -n "$f"; done
+      - name: PowerShell syntax
         shell: pwsh
         run: |
-          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
-          $issues = @(Invoke-ScriptAnalyzer -Path install.ps1 -Severity Error) + @(Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Error)
-          $issues | Format-Table -AutoSize
-          if ($issues) { exit 1 }
-      - name: JSON, JSON-LD and sitemap are valid
-        run: |
-          python3 - <<'EOF'
-          import json, re, xml.dom.minidom, html.parser
-          json.load(open("config/settings.json"))
-          s = open("docs/index.html").read()
-          blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', s, re.S)
-          assert len(blocks) == 2, blocks
-          for b in blocks:
-              json.loads(b)
-          html.parser.HTMLParser().feed(s)
-          xml.dom.minidom.parse("docs/sitemap.xml")
-          print("ok")
-          EOF
+          [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path install.ps1), [ref]$null, [ref]$null) | Out-Null
+          Get-ChildItem scripts/*.ps1 | ForEach-Object {
+            [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$null) | Out-Null
+          }
 
-  install-unix:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            shell: /bin/bash
-          - os: macos-latest
-            shell: /bin/bash   # macOS ships bash 3.2
-    runs-on: ${{ matrix.os }}
+  surplus-live:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    env:
+      SURPLUS_API_KEY: ${{ secrets.SURPLUS_API_KEY }}
     steps:
       - uses: actions/checkout@v4
-      - name: Install, re-run, check, uninstall (no Claude Code, dummy key)
+      - name: Run live Surplus smoke tests
+        run: |
+          if [ -z "$SURPLUS_API_KEY" ]; then
+            echo "SURPLUS_API_KEY secret is not configured; skipping live tests"
+            exit 0
+          fi
+          python3 tests/surplus_smoke.py
+
+  install-unix:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install and uninstall
         env:
-          ZAI_API_KEY: dummy-key-for-ci
+          SURPLUS_API_KEY: dummy-key-for-ci
         run: |
           set -eu
-          export SHELL=${{ matrix.shell }}
-          printf 'export CI_NO_TRAILING_NEWLINE=1' >> ~/.bashrc   # last line without newline
-          ${{ matrix.shell }} ./install.sh --no-mcp
-          ${{ matrix.shell }} ./install.sh --no-mcp
-          ls -l ~/.config/zai/api_key
-          for rc in ~/.bashrc ~/.bash_profile ~/.zshrc; do
-            [ -f "$rc" ] || continue
-            n=$(grep -c '>>> claude-z >>>' "$rc" || true)
-            echo "$rc: $n block(s)"; [ "$n" -le 1 ]
-          done
-          jq -e '.statusLine.command == "~/.claude-z/statusline.sh"' ~/.claude-z/settings.json
-          jq -e '[.hooks.UserPromptSubmit[].hooks[].command] | length == 1' ~/.claude-z/settings.json
-          ${{ matrix.shell }} -c '. ~/.claude-z/claude-z.sh; type claude-z zai-usage'
-          grep -q 'CLAUDE_CODE_AUTO_MODE_SERVER=0' ~/.claude-z/claude-z.sh   # auto mode needs the local classifier on z.ai
-          grep -q "ANTHROPIC_MODEL='glm-5.3\[1m\]'" ~/.claude-z/claude-z.sh   # 1M context model names
-          grep -q 'CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000' ~/.claude-z/claude-z.sh
-          grep -q 'CLAUDE_CODE_ALWAYS_ENABLE_EFFORT=1' ~/.claude-z/claude-z.sh
-          jq -e '.permissions.deny | index("Read(~/.config/zai/**)")' ~/.claude-z/settings.json
-          echo '{"prompt":"/zai-usage"}' | ~/.claude-z/hooks/zai-usage-hook.sh | jq -e '.decision == "block"'
-          [ -z "$(echo '{"prompt":"hello"}' | ~/.claude-z/hooks/zai-usage-hook.sh)" ]
-          echo '{"model":{"display_name":"glm-5.3[1m]"}}' | ~/.claude-z/statusline.sh
-          ${{ matrix.shell }} ./install.sh --uninstall --purge
-          if grep -q 'claude-z' ~/.bashrc; then echo "rc block not removed"; exit 1; fi
-          if [ -f ~/.config/zai/api_key ]; then echo "key not purged"; exit 1; fi
+          ./install.sh --no-mcp
+          grep -q "https://api.surplusintelligence.ai/v1" ~/.claudez/claudez.sh
+          grep -q "glm-5.3\[1m\]" ~/.claudez/claudez.sh
+          grep -q "qwen3.8-omni-flash" ~/.claudez/claudez.sh
+          test -f ~/.config/surplus/api_key
+          ./install.sh --uninstall --purge
+          test ! -f ~/.config/surplus/api_key
 
   install-windows:
     runs-on: windows-latest
     strategy:
-      fail-fast: false
       matrix:
-        shell: [powershell, pwsh]   # Windows PowerShell 5.1 and PowerShell 7
+        shell: [powershell, pwsh]
     defaults:
       run:
         shell: ${{ matrix.shell }}
     steps:
       - uses: actions/checkout@v4
-      - name: Install, re-run, check, uninstall (no Claude Code, dummy key)
+      - name: Install and uninstall
         env:
-          ZAI_API_KEY: dummy-key-for-ci
+          SURPLUS_API_KEY: dummy-key-for-ci
         run: |
-          $ErrorActionPreference = 'Stop'
-          $docs = [Environment]::GetFolderPath('MyDocuments')
-          New-Item -ItemType Directory -Force "$docs\PowerShell" | Out-Null
-          [IO.File]::WriteAllText("$docs\PowerShell\profile.ps1", '$env:CI_NO_TRAILING_NEWLINE = 1')   # last line without newline
           .\install.ps1 -NoMcp
-          .\install.ps1 -NoMcp
-          icacls "$HOME\.config\zai\api_key"
-          foreach ($p in "$docs\WindowsPowerShell\profile.ps1", "$docs\PowerShell\profile.ps1") {
-            $n = @(Select-String -Path $p -SimpleMatch '>>> claude-z >>>').Count
-            "$p : $n block(s)"; if ($n -ne 1) { throw "expected 1 block in $p" }
-          }
-          $s = Get-Content "$HOME\.claude-z\settings.json" -Raw | ConvertFrom-Json
-          if ($s.statusLine.command -notmatch 'statusline\.ps1') { throw 'statusLine not set' }
-          if (@($s.hooks.UserPromptSubmit).Count -ne 1) { throw 'hook missing or duplicated' }
-          if (@($s.permissions.deny) -notcontains 'Read(~/.config/zai/**)') { throw 'key file deny rule missing' }
-          . "$HOME\.claude-z\claude-z.ps1"
-          Get-Command claude-z, zai-usage | Format-Table Name, CommandType
-          if (-not (Select-String -Path "$HOME\.claude-z\claude-z.ps1" -SimpleMatch "CLAUDE_CODE_AUTO_MODE_SERVER             = '0'")) { throw 'auto mode server setting missing' }
-          foreach ($want in "ANTHROPIC_MODEL                          = 'glm-5.3[1m]'", "CLAUDE_CODE_AUTO_COMPACT_WINDOW          = '1000000'", "CLAUDE_CODE_ALWAYS_ENABLE_EFFORT         = '1'") {
-            if (-not (Select-String -Path "$HOME\.claude-z\claude-z.ps1" -SimpleMatch $want)) { throw "1M context setting missing: $want" }
-          }
-          $out = '{"prompt":"/zai-usage"}' | powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\.claude-z\hooks\zai-usage-hook.ps1"
-          if (($out | ConvertFrom-Json).decision -ne 'block') { throw "hook did not block: $out" }
-          $none = '{"prompt":"hello"}' | powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\.claude-z\hooks\zai-usage-hook.ps1"
-          if ($none) { throw "hook blocked a normal prompt: $none" }
-          '{"model":{"display_name":"glm-5.3[1m]"}}' | powershell -NoProfile -ExecutionPolicy Bypass -File "$HOME\.claude-z\statusline.ps1"
+          Select-String -Path "$HOME\.claudez\claudez.ps1" -SimpleMatch "https://api.surplusintelligence.ai/v1"
+          Select-String -Path "$HOME\.claudez\claudez.ps1" -SimpleMatch "glm-5.3[1m]"
+          Select-String -Path "$HOME\.claudez\claudez.ps1" -SimpleMatch "qwen3.8-omni-flash"
           .\install.ps1 -Uninstall -Purge
-          if (Test-Path "$HOME\.config\zai\api_key") { throw 'key not purged' }

@@ -50,9 +50,12 @@ def main():
     assert "glm-5.3" in model_ids, "glm-5.3 missing from model catalog"
     assert "qwen3.8-omni-flash" in model_ids, "qwen3.8-omni-flash missing from model catalog"
 
+    # Thinking tokens count against max_tokens on Surplus GLM; disable thinking
+    # so exact-match asserts are deterministic at small max_tokens.
     text_payload = {
         "model": "glm-5.3",
         "max_tokens": 64,
+        "thinking": {"type": "disabled"},
         "messages": [{"role": "user", "content": "Reply exactly: SURPLUS_TEXT_OK"}],
     }
     status, body = request(MESSAGES_URL, api_key, text_payload)
@@ -68,7 +71,8 @@ def main():
 
     vision_payload = {
         "model": "qwen3.8-omni-flash",
-        "max_tokens": 16,
+        "max_tokens": 256,
+        "thinking": {"type": "disabled"},
         "messages": [{
             "role": "user",
             "content": [

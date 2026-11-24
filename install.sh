@@ -140,6 +140,7 @@ do_install() {
     | .permissions.deny = (((.permissions.deny // []) + $t.permissions.deny) | unique)
     | (if (.statusLine == null) or ((.statusLine.command // "") | test("claudez/statusline"))
        then .statusLine = $t.statusLine else . end)
+    | .modelOverrides = (($t.modelOverrides // {}) + (.modelOverrides // {}))
   ' "$settings" > "$tmp" && mv "$tmp" "$settings"
   if ! jq -e '(.statusLine.command // "") | test("claudez/statusline")' "$settings" >/dev/null; then
     warn "Kept your existing statusLine in $settings; the Surplus status line was not enabled"

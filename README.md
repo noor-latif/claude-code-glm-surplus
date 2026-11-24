@@ -4,7 +4,7 @@ Run Claude Code through [Surplus Intelligence](https://www.surplusintelligence.a
 
 - Public Surplus base URL: `https://api.surplusintelligence.ai/v1`
 - Claude Code protocol URL: `https://api.surplusintelligence.ai/anthropic`
-- Main, Sonnet, Opus, Haiku, and subagent model: `glm-5.3[1m]`
+- Main, Sonnet, Opus, Haiku, and subagent model: `glm-5.3`
 - Vision model: `qwen3.8-omni-flash`
 - Web search: free DuckDuckGo MCP server; no Surplus quota or search key required
 - Separate config: `~/.claudez`
@@ -62,9 +62,14 @@ To remove the launcher and MCP server:
 
 | Claude role | Surplus model |
 |---|---|
-| Main, Opus, Sonnet, Haiku | `glm-5.3[1m]` |
-| Subagent and auto mode | `glm-5.3[1m]` |
+| Main, Opus, Sonnet, Haiku | `glm-5.3` |
+| Subagent and auto mode | `glm-5.3` |
 | Vision | `qwen3.8-omni-flash` |
+
+`glm-5.3` has a 1M-token context window in the Surplus catalog; the launcher pins
+`CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000`. The installers also merge a
+`modelOverrides` entry into `~/.claudez/settings.json` so Claude Code recognizes
+the Surplus model id instead of printing `[claude-code:unrecognized_model]`.
 
 ## Web search
 

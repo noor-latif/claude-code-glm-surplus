@@ -50,7 +50,7 @@ jobs:
           set -eu
           ./install.sh --no-mcp
           grep -q "https://api.surplusintelligence.ai/v1" ~/.claudez/claudez.sh
-          grep -q "glm-5.3\[1m\]" ~/.claudez/claudez.sh
+          grep -q "glm-5.3" ~/.claudez/claudez.sh
           grep -q "qwen3.8-omni-flash" ~/.claudez/claudez.sh
           test -f ~/.config/surplus/api_key
           ./install.sh --uninstall --purge
@@ -72,6 +72,6 @@ jobs:
         run: |
           .\install.ps1 -NoMcp
           Select-String -Path "$HOME\.claudez\claudez.ps1" -SimpleMatch "https://api.surplusintelligence.ai/v1"
-          Select-String -Path "$HOME\.claudez\claudez.ps1" -SimpleMatch "glm-5.3[1m]"
+          Select-String -Path "$HOME\.claudez\claudez.ps1" -SimpleMatch "glm-5.3"
           Select-String -Path "$HOME\.claudez\claudez.ps1" -SimpleMatch "qwen3.8-omni-flash"
           .\install.ps1 -Uninstall -Purge

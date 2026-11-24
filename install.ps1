@@ -131,6 +131,8 @@ function Invoke-Install {
   if (-not $settings.statusLine -or "$($settings.statusLine.command)" -match 'claudez[/\\]statusline') {
     Set-Prop $settings 'statusLine' ([pscustomobject]@{ type = 'command'; command = $statusCmd; padding = 0 })
   }
+  if (-not $settings.modelOverrides) { Set-Prop $settings 'modelOverrides' ([pscustomobject]@{}) }
+  $settings.modelOverrides | Add-Member -Force -NotePropertyName 'claude-sonnet-4-6' -NotePropertyValue 'glm-5.3'
   Write-Settings $settings
 
   foreach ($profile in Get-ProfilePaths) {

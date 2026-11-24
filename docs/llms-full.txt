@@ -8,7 +8,7 @@ Run Claude Code through [Surplus Intelligence](https://www.surplusintelligence.a
 
 - Public Surplus base URL: `https://api.surplusintelligence.ai/v1`
 - Claude Code protocol URL: `https://api.surplusintelligence.ai/anthropic`
-- Main, Sonnet, Opus, Haiku, and subagent model: `glm-5.3[1m]`
+- Main, Sonnet, Opus, Haiku, and subagent model: `glm-5.3`
 - Vision model: `qwen3.8-omni-flash`
 - Web search: free DuckDuckGo MCP server; no Surplus quota or search key required
 - Separate config: `~/.claudez`
@@ -66,9 +66,14 @@ To remove the launcher and MCP server:
 
 | Claude role | Surplus model |
 |---|---|
-| Main, Opus, Sonnet, Haiku | `glm-5.3[1m]` |
-| Subagent and auto mode | `glm-5.3[1m]` |
+| Main, Opus, Sonnet, Haiku | `glm-5.3` |
+| Subagent and auto mode | `glm-5.3` |
 | Vision | `qwen3.8-omni-flash` |
+
+`glm-5.3` has a 1M-token context window in the Surplus catalog; the launcher pins
+`CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000`. The installers also merge a
+`modelOverrides` entry into `~/.claudez/settings.json` so Claude Code recognizes
+the Surplus model id instead of printing `[claude-code:unrecognized_model]`.
 
 ## Web search
 
@@ -119,15 +124,15 @@ function claudez {
   ANTHROPIC_API_KEY="" \
   SURPLUS_API_KEY="$key" \
   API_TIMEOUT_MS=3000000 \
-  ANTHROPIC_MODEL='glm-5.3[1m]' \
-  ANTHROPIC_SMALL_FAST_MODEL='glm-5.3[1m]' \
-  ANTHROPIC_DEFAULT_OPUS_MODEL='glm-5.3[1m]' \
-  ANTHROPIC_DEFAULT_SONNET_MODEL='glm-5.3[1m]' \
-  ANTHROPIC_DEFAULT_HAIKU_MODEL='glm-5.3[1m]' \
-  CLAUDE_CODE_SUBAGENT_MODEL='glm-5.3[1m]' \
+  ANTHROPIC_MODEL='glm-5.3' \
+  ANTHROPIC_SMALL_FAST_MODEL='glm-5.3' \
+  ANTHROPIC_DEFAULT_OPUS_MODEL='glm-5.3' \
+  ANTHROPIC_DEFAULT_SONNET_MODEL='glm-5.3' \
+  ANTHROPIC_DEFAULT_HAIKU_MODEL='glm-5.3' \
+  CLAUDE_CODE_SUBAGENT_MODEL='glm-5.3' \
   CLAUDE_CODE_AUTO_COMPACT_WINDOW=1000000 \
   CLAUDE_CODE_AUTO_MODE_SERVER=0 \
-  CLAUDE_CODE_AUTO_MODE_MODEL='glm-5.3[1m]' \
+  CLAUDE_CODE_AUTO_MODE_MODEL='glm-5.3' \
   CLAUDE_CODE_ALWAYS_ENABLE_EFFORT=1 \
   ANTHROPIC_VISION_MODEL='qwen3.8-omni-flash' \
   SURPLUS_VISION_MODEL='qwen3.8-omni-flash' \
@@ -175,15 +180,15 @@ function claudez {
     ANTHROPIC_API_KEY                        = ''
     SURPLUS_API_KEY                          = $key
     API_TIMEOUT_MS                           = '3000000'
-    ANTHROPIC_MODEL                          = 'glm-5.3[1m]'
-    ANTHROPIC_SMALL_FAST_MODEL               = 'glm-5.3[1m]'
-    ANTHROPIC_DEFAULT_OPUS_MODEL             = 'glm-5.3[1m]'
-    ANTHROPIC_DEFAULT_SONNET_MODEL           = 'glm-5.3[1m]'
-    ANTHROPIC_DEFAULT_HAIKU_MODEL            = 'glm-5.3[1m]'
-    CLAUDE_CODE_SUBAGENT_MODEL               = 'glm-5.3[1m]'
+    ANTHROPIC_MODEL                          = 'glm-5.3'
+    ANTHROPIC_SMALL_FAST_MODEL               = 'glm-5.3'
+    ANTHROPIC_DEFAULT_OPUS_MODEL             = 'glm-5.3'
+    ANTHROPIC_DEFAULT_SONNET_MODEL           = 'glm-5.3'
+    ANTHROPIC_DEFAULT_HAIKU_MODEL            = 'glm-5.3'
+    CLAUDE_CODE_SUBAGENT_MODEL               = 'glm-5.3'
     CLAUDE_CODE_AUTO_COMPACT_WINDOW          = '1000000'
     CLAUDE_CODE_AUTO_MODE_SERVER             = '0'
-    CLAUDE_CODE_AUTO_MODE_MODEL              = 'glm-5.3[1m]'
+    CLAUDE_CODE_AUTO_MODE_MODEL              = 'glm-5.3'
     CLAUDE_CODE_ALWAYS_ENABLE_EFFORT         = '1'
     ANTHROPIC_VISION_MODEL                   = 'qwen3.8-omni-flash'
     SURPLUS_VISION_MODEL                     = 'qwen3.8-omni-flash'
@@ -227,12 +232,17 @@ $parts -join ' | '
 ```json
 {
   "permissions": {
-    "deny": ["Read(~/.config/surplus/**)"]
+    "deny": [
+      "Read(~/.config/surplus/**)"
+    ]
   },
   "statusLine": {
     "type": "command",
     "command": "~/.claudez/statusline.sh",
     "padding": 0
+  },
+  "modelOverrides": {
+    "claude-sonnet-4-6": "glm-5.3"
   }
 }
 ```
@@ -382,6 +392,7 @@ do_install() {
     | .permissions.deny = (((.permissions.deny // []) + $t.permissions.deny) | unique)
     | (if (.statusLine == null) or ((.statusLine.command // "") | test("claudez/statusline"))
        then .statusLine = $t.statusLine else . end)
+    | .modelOverrides = (($t.modelOverrides // {}) + (.modelOverrides // {}))
   ' "$settings" > "$tmp" && mv "$tmp" "$settings"
   if ! jq -e '(.statusLine.command // "") | test("claudez/statusline")' "$settings" >/dev/null; then
     warn "Kept your existing statusLine in $settings; the Surplus status line was not enabled"
@@ -561,6 +572,8 @@ function Invoke-Install {
   if (-not $settings.statusLine -or "$($settings.statusLine.command)" -match 'claudez[/\\]statusline') {
     Set-Prop $settings 'statusLine' ([pscustomobject]@{ type = 'command'; command = $statusCmd; padding = 0 })
   }
+  if (-not $settings.modelOverrides) { Set-Prop $settings 'modelOverrides' ([pscustomobject]@{}) }
+  $settings.modelOverrides | Add-Member -Force -NotePropertyName 'claude-sonnet-4-6' -NotePropertyValue 'glm-5.3'
   Write-Settings $settings
 
   foreach ($profile in Get-ProfilePaths) {

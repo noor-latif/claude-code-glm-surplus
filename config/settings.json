@@ -1,10 +1,15 @@
 {
   "permissions": {
-    "deny": ["Read(~/.config/surplus/**)"]
+    "deny": [
+      "Read(~/.config/surplus/**)"
+    ]
   },
   "statusLine": {
     "type": "command",
     "command": "~/.claudez/statusline.sh",
     "padding": 0
+  },
+  "modelOverrides": {
+    "claude-sonnet-4-6": "glm-5.3"
   }
 }

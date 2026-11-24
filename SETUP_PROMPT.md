@@ -8,6 +8,6 @@ Set up Claude Code with Surplus Intelligence from this repository.
 4. Confirm the launcher uses:
    - `SURPLUS_BASE_URL=https://api.surplusintelligence.ai/v1`
    - `ANTHROPIC_BASE_URL=https://api.surplusintelligence.ai/anthropic`
-   - `glm-5.3[1m]` for Claude roles
+   - `glm-5.3` for Claude roles
    - `qwen3.8-omni-flash` for vision
 5. Confirm DuckDuckGo web search is registered as the `duckduckgo-search` MCP server.
